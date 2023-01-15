@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      width: 100%;
+      height: 100%;
+      background: #2b2b2b;
+      color: #eee;
+    }
+
+    body {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      align-content: center;
+    }
+
+    .date {
+      width: 100%;
+      text-align: center;
+      margin-bottom: 4vh;
+      font-weight: bold;
+      letter-spacing: 0.4vw;
+    }
+
+    .time {
+      display: flex;
+    }
+
+    .flip {
+      margin: 0 1vw;
+    }
+
+    .flip .digit {
+      font-size: 20vh;
+      font-weight: 900;
+      padding: 0 1.5vw;
+      text-align: center;
+    }
+
+    .flip .ctnr {
+      background: #282828;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="date" class="date"></div>
+  <div class="time">
+    <div id="hour" class="flip"></div>
+    <div id="minute" class="flip"></div>
+    <div id="second" class="flip"></div>
+  </div>
+  <script src="https://cdn.bootcdn.net/ajax/libs/dayjs/1.11.7/dayjs.min.js"></script>
+  <script src="https://unpkg.com/number-flip@1.1.10/dist/index.js"></script>
+  <script>
+    const $ = s => document.querySelector(s);
+
+    const getDate = () => {
+      const weeks = ['星期一', '星期二', '星期三', '星期四', '星期五', '星期六', '星期天',];
+      return dayjs().format('YYYY-MM-DD') + weeks[dayjs().day()]
+    }
+
+    window.onload = () => {
+      $('#date').innerHTML = getDate();
+      let dHour = dayjs().hour();
+      if (dHour < 10) dHour = '0' + dHour
+      let dMinute = dayjs().minute();
+      if (dMinute < 10) dMinute = '0' + dMinute
+      let dSecond = dayjs().second();
+      if (dSecond < 10) dSecond = '0' + dSecond
+
+      const fHour = new NumberFlip.Flip({
+        node: $("#hour"),
+        from: dHour,
+      });
+      const fMinute = new NumberFlip.Flip({
+        node: $("#minute"),
+        from: dMinute,
+      });
+      const fSecond = new NumberFlip.Flip({
+        node: $("#second"),
+        from: dSecond,
+      });
+      setInterval(() => {
+        const nextHour = dHour + 1;
+        const nextMinute = dMinute + 1;
+        const nextSecond = dSecond + 1;
+        if (nextSecond === 60) {
+          // 进1
+          if (nextMinute === 6) {
+            if (nextHour === 24) {
+              dHour = 00;
+              fHour.flipTo({
+                to: dHour,
+                direct: false
+              });
+            } else {
+              fHour.flipTo({
+                to: ++dHour,
+                direct: false
+              });
+            }
+            dMinute = 00;
+            fMinute.flipTo({
+              to: dMinute,
+              direct: false
+            });
+          } else {
+            fMinute.flipTo({
+              to: ++dMinute,
+              direct: false
+            });
+          }
+          dSecond = 00;
+          fSecond.flipTo({
+            to: dSecond,
+            direct: false
+          });
+        } else {
+          // 持续+1
+          fSecond.flipTo({
+            to: ++dSecond,
+            direct: false
+          });
+        }
+      }, 1000);
+    }
+
+  </script>
+</body>
+
+</html>
